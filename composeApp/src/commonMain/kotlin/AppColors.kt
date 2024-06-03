@@ -1,5 +1,4 @@
 import androidx.compose.ui.graphics.Color
-import androidx.annotation.FloatRange
 
 object AppColors {
     val WhiteBG = Color.White
@@ -36,4 +35,4 @@ object AppColors {
     val BlackAlpha20 = Color(0x33000000)
 }
 
-fun Color.alpha(@FloatRange(from = 0.0, to = 1.0) alpha: Float): Color = this.copy(alpha = alpha)
+fun Color.alpha(alpha: Float): Color = this.copy(alpha = alpha)

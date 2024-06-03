@@ -23,11 +23,11 @@ import kotlinx.datetime.LocalDate
 
 @Composable
 fun rememberCalendarViewModel(
-    config: CalendarConfig = CalendarConfig()
+    config: () -> CalendarConfig = { CalendarConfig() }
 ): CalendarViewModel {
     val scope = rememberCoroutineScope()
     return remember {
-        CalendarViewModel(scope, config)
+        CalendarViewModel(scope, config())
     }
 }
 
@@ -41,6 +41,7 @@ data class CalendarConfig(
     val limitMaxEnd: LocalDate? = null,
     val minimumSelectionRange: Int = 0,
     val weekStartDay: DayOfWeek = DayOfWeek.MONDAY,
+    val singleSelection: Boolean = false,
 )
 
 class CalendarViewModel(
@@ -119,11 +120,21 @@ class CalendarViewModel(
 
     private fun RangeSelection.modifyOnClick(date: LocalDate): RangeSelection {
         return when (this) {
-            None -> Range(
-                start = date,
-                end = date.plusDays(config.minimumSelectionRange),
-                endInclusive = false
-            )
+            None -> {
+                if (config.singleSelection) {
+                    Range(
+                        start = date,
+                        end = date,
+                        endInclusive = true
+                    )
+                } else {
+                    Range(
+                        start = date,
+                        end = date.plusDays(config.minimumSelectionRange),
+                        endInclusive = false
+                    )
+                }
+            }
 
             is Range -> {
                 if (endInclusive) {

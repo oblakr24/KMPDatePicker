@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -39,7 +40,7 @@ sealed class CalendarRow(open val id: String, open val type: String, open val in
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CustomCalendarDisplay(
-    config: CalendarConfig = CalendarConfig(),
+    config: () -> CalendarConfig = { CalendarConfig() },
     vm: CalendarViewModel = rememberCalendarViewModel(config = config),
     daysHeader: @Composable (CalendarConfig) -> Unit = { cfg ->
         WeekDaysRow(
@@ -80,6 +81,7 @@ fun CustomCalendarDisplay(
 
     LazyColumn(state = state, modifier = modifier) {
         stickyHeader {
+            val config = remember(config)
             daysHeader(config)
         }
 
@@ -141,15 +143,17 @@ fun CustomCalendarDisplayPreview() {
 fun CustomCalendarDisplaySelectionPreview() {
     AppTheme {
         val vm = rememberCalendarViewModel(
-            config = CalendarConfig(
-                startMonth = YearMonth.now(),
-                endMonth = YearMonth.now().plusMonths(4),
-                initialSelection = RangeSelection.Range(
-                    LocalDate.now().plusDays(3),
-                    LocalDate.now().plusDays(14),
-                    endInclusive = true
-                ),
-            )
+            config = {
+                CalendarConfig(
+                    startMonth = YearMonth.now(),
+                    endMonth = YearMonth.now().plusMonths(4),
+                    initialSelection = RangeSelection.Range(
+                        LocalDate.now().plusDays(3),
+                        LocalDate.now().plusDays(14),
+                        endInclusive = true
+                    ),
+                )
+            }
         )
         CustomCalendarDisplay(
             vm = vm, modifier = Modifier
@@ -165,15 +169,17 @@ fun CustomCalendarDisplaySelectionPreview() {
 fun CustomCalendarDisplayOpenSelectionPreview() {
     AppTheme {
         val vm = rememberCalendarViewModel(
-            config = CalendarConfig(
-                startMonth = YearMonth.now(),
-                endMonth = YearMonth.now().plusMonths(4),
-                initialSelection = RangeSelection.Range(
-                    LocalDate.now().minusDays(35),
-                    LocalDate.now().plusDays(2),
-                    endInclusive = false,
-                ),
-            )
+            config = {
+                CalendarConfig(
+                    startMonth = YearMonth.now(),
+                    endMonth = YearMonth.now().plusMonths(4),
+                    initialSelection = RangeSelection.Range(
+                        LocalDate.now().minusDays(35),
+                        LocalDate.now().plusDays(2),
+                        endInclusive = false,
+                    ),
+                )
+            }
         )
         CustomCalendarDisplay(
             vm = vm, modifier = Modifier

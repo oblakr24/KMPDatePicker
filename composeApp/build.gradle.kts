@@ -67,7 +67,7 @@ kotlin {
             
             // Coroutines
             implementation(libs.kotlinx.coroutines.core)
-            runtimeOnly(libs.kotlinx.coroutines.swing)
+//            runtimeOnly(libs.kotlinx.coroutines.swing)
             
             implementation(libs.kotlinx.datetime)
             
@@ -75,6 +75,10 @@ kotlin {
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
+        }
+
+        wasmJsMain.dependencies {
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-wasm-js:1.9.0-RC")
         }
     }
 }
