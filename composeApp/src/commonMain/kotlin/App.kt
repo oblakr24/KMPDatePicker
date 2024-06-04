@@ -34,6 +34,7 @@ fun App() {
             Modifier.fillMaxWidth().padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text("This is a demo")
 
             var confirmed: Boolean by remember { mutableStateOf(false) }
             var singleSelection: Boolean by remember { mutableStateOf(true) }
