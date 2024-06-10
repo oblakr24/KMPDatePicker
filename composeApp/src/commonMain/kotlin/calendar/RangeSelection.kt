@@ -13,5 +13,7 @@ sealed interface RangeSelection {
     data class Range(
         override val start: LocalDate, override val end: LocalDate,
         val endInclusive: Boolean
-    ) : RangeSelection, IRange
+    ) : RangeSelection, IRange {
+        fun isSingle() = start == end && endInclusive
+    }
 }

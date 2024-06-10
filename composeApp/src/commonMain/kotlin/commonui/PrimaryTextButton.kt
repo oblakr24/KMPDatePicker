@@ -9,7 +9,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -30,16 +29,11 @@ fun PrimaryTextButton(
         ),
         enabled = enabled,
         contentPadding = contentPadding,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.Transparent,
-            contentColor = AppColors.PrimaryGreen,
-            disabledContainerColor = Color.Transparent,
-            disabledContentColor = AppColors.DisabledGray,
-        ),
     ) {
         Text(
             text = text,
-            style = if (small) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium
+            style = if (small) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
         )
     }
 }

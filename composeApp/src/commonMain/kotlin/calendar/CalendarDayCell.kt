@@ -10,9 +10,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -21,14 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
-
 data class MonthData(
     val monthDisplay: String,
+    val month: YearMonth,
+    val index: Int,
     val items: List<DayItem>,
 )
 
@@ -42,7 +41,6 @@ data class DayItem(
     val inRangeFromPrevMonth: Boolean = false,
     val inRangeFromNextMonth: Boolean = false,
 ) {
-
     enum class MonthType {
         PREV, CURR, NEXT,
     }
@@ -52,6 +50,7 @@ data class DayItem(
     }
 
     enum class RangeStyling {
+        SINGLE,
         IN_RANGE,
         IN_RANGE_START,
         IN_RANGE_END,
@@ -60,6 +59,7 @@ data class DayItem(
 }
 
 fun DayItem.RangeStyling.resolved() = when (this) {
+    DayItem.RangeStyling.SINGLE -> ResolvedRangeStyling.SINGLE
     DayItem.RangeStyling.IN_RANGE -> ResolvedRangeStyling.IN_RANGE
     DayItem.RangeStyling.IN_RANGE_START -> ResolvedRangeStyling.IN_RANGE_START
     DayItem.RangeStyling.IN_RANGE_END -> ResolvedRangeStyling.IN_RANGE_END
@@ -67,58 +67,55 @@ fun DayItem.RangeStyling.resolved() = when (this) {
 }
 
 enum class ResolvedRangeStyling(
-    val bgColor: Color,
-    val textColor: Color,
-    val shape: RoundedCornerShape = RoundedCornerShape(0.dp),
     val hasInnerShape: Boolean = false,
-    val innerShapeColor: Color = AppColors.PrimaryGreen,
     val bgFillLeft: Boolean = true,
     val bgFillRight: Boolean = true,
 ) {
-    IN_RANGE(bgColor = AppColors.BackgroundLightGreen, textColor = AppColors.PrimaryDarkNavy),
-    IN_RANGE_START(
-        bgColor = AppColors.BackgroundLightGreen,
+    SINGLE(
         hasInnerShape = true,
-        textColor = Color.White,
-        shape = RoundedCornerShape(
-            50, 0, 0, 50
-        ),
+        bgFillLeft = false,
+        bgFillRight = false,
+    ),
+    IN_RANGE,
+    IN_RANGE_START(
+        hasInnerShape = true,
         bgFillLeft = false,
     ),
     IN_RANGE_END(
-        bgColor = AppColors.BackgroundLightGreen,
         hasInnerShape = true,
-        textColor = Color.White,
-        shape = RoundedCornerShape(
-            0, 50, 50, 0
-        ),
         bgFillRight = false,
     ),
-    IN_RANGE_END_DISABLED(
-        bgColor = AppColors.BackgroundLightGreen,
-        hasInnerShape = true,
-        textColor = AppColors.WhiteBG,
-        shape = RoundedCornerShape(
-            0, 50, 50, 0
-        ),
-        innerShapeColor = AppColors.DisabledGray,
-        bgFillRight = false,
-    ),
-    IN_RANGE_END_DISABLED_INSIDE(
-        bgColor = AppColors.BackgroundLightGreen,
-        hasInnerShape = true,
-        textColor = AppColors.WhiteBG,
-        innerShapeColor = AppColors.DisabledGray,
-    ),
-    NORMAL(bgColor = Color.Transparent, textColor = AppColors.PrimaryDarkNavy);
+    NORMAL;
 }
 
 @Composable
-fun CalendarDayCell(item: DayItem, modifier: Modifier = Modifier, onClick: () -> Unit) {
+private fun ResolvedRangeStyling.bgColor(colors: CalendarCellColors) = when(this) {
+    ResolvedRangeStyling.SINGLE -> colors.selectionMainColor
+    ResolvedRangeStyling.IN_RANGE -> colors.selectionRangeColor
+    ResolvedRangeStyling.IN_RANGE_START -> colors.selectionRangeColor
+    ResolvedRangeStyling.IN_RANGE_END -> colors.selectionRangeColor
+    ResolvedRangeStyling.NORMAL -> colors.noSelectionBg
+}
+
+@Composable
+private fun ResolvedRangeStyling.textColor(colors: CalendarCellColors) = when(this) {
+    ResolvedRangeStyling.SINGLE -> colors.textColorInMainRange
+    ResolvedRangeStyling.IN_RANGE -> colors.textColorInRange
+    ResolvedRangeStyling.IN_RANGE_START -> colors.textColorInMainRange
+    ResolvedRangeStyling.IN_RANGE_END -> colors.textColorInMainRange
+    ResolvedRangeStyling.NORMAL -> colors.textColorOutOfRange
+}
+
+@Composable
+fun CalendarDayCell(item: DayItem,
+                    colors: CalendarCellColors = CalendarDefaults.calendarColors(),
+                    modifier: Modifier = Modifier,
+                    onClick: () -> Unit) {
     val styling = item.styling.resolved()
+    val height = 50.dp
     Box(
         modifier = modifier
-            .height(50.dp)
+            .height(height)
             .let {
                 if (item.textStyling == DayItem.TextStyling.DISABLED) {
                     it
@@ -133,11 +130,12 @@ fun CalendarDayCell(item: DayItem, modifier: Modifier = Modifier, onClick: () ->
         if (styling.bgFillLeft && styling.bgFillRight) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxHeight()
+                    .aspectRatio(1f)
                     .background(
                         when (item.monthType) {
                             DayItem.MonthType.PREV -> Color.Gray
-                            DayItem.MonthType.CURR -> styling.bgColor
+                            DayItem.MonthType.CURR -> styling.bgColor(colors)
                             DayItem.MonthType.NEXT -> Color.Gray
                         }
                     ),
@@ -146,12 +144,13 @@ fun CalendarDayCell(item: DayItem, modifier: Modifier = Modifier, onClick: () ->
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .fillMaxWidth(0.5f)
+                    .aspectRatio(1f)
+                    .padding(end = 25.dp)
                     .align(Alignment.CenterStart)
                     .background(
                         when (item.monthType) {
                             DayItem.MonthType.PREV -> Color.Gray
-                            DayItem.MonthType.CURR -> styling.bgColor
+                            DayItem.MonthType.CURR -> styling.bgColor(colors)
                             DayItem.MonthType.NEXT -> Color.Gray
                         }
                     ),
@@ -160,12 +159,13 @@ fun CalendarDayCell(item: DayItem, modifier: Modifier = Modifier, onClick: () ->
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .fillMaxWidth(0.5f)
+                    .aspectRatio(1f)
+                    .padding(start = 25.dp)
                     .align(Alignment.CenterEnd)
                     .background(
                         when (item.monthType) {
                             DayItem.MonthType.PREV -> Color.Gray
-                            DayItem.MonthType.CURR -> styling.bgColor
+                            DayItem.MonthType.CURR -> styling.bgColor(colors)
                             DayItem.MonthType.NEXT -> Color.Gray
                         }
                     ),
@@ -174,21 +174,21 @@ fun CalendarDayCell(item: DayItem, modifier: Modifier = Modifier, onClick: () ->
         if (item.inRangeFromPrevMonth || item.inRangeFromNextMonth) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxHeight()
+                    .aspectRatio(1f)
                     .background(Color.Gray),
             )
         }
         Box(
             modifier = Modifier
-                .height(50.dp)
-                .width(50.dp)
+                .fillMaxHeight()
                 .aspectRatio(1f)
 
                 .let {
                     if (styling.hasInnerShape) {
-                        it.background(styling.innerShapeColor, RoundedCornerShape(50))
+                        it.background(colors.selectionMainColor, RoundedCornerShape(50))
                     } else if (item.textStyling == DayItem.TextStyling.TODAY_DISABLED) {
-                        it.border(1.dp, AppColors.GrayLine, RoundedCornerShape(50))
+                        it.border(1.dp, colors.divider, RoundedCornerShape(50))
                     } else {
                         it
                     }
@@ -199,9 +199,9 @@ fun CalendarDayCell(item: DayItem, modifier: Modifier = Modifier, onClick: () ->
                 text = item.text,
                 textAlign = TextAlign.Center,
                 color = when (item.textStyling) {
-                    DayItem.TextStyling.ENABLED -> styling.textColor
-                    DayItem.TextStyling.DISABLED -> AppColors.GrayLine
-                    DayItem.TextStyling.TODAY_DISABLED -> AppColors.GrayLine
+                    DayItem.TextStyling.ENABLED -> styling.textColor(colors)
+                    DayItem.TextStyling.DISABLED -> colors.disabledText
+                    DayItem.TextStyling.TODAY_DISABLED -> colors.disabledText
                 },
                 modifier = Modifier,
                 style = AppTypography.Body4SemiBold,

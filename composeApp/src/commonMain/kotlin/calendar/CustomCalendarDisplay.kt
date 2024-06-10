@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,6 +36,8 @@ sealed class CalendarRow(open val id: String, open val type: String, open val in
 
     data class MonthHeader(val title: String, override val id: String, override val index: Int) :
         CalendarRow(id, type = "MonthHeader", index = index)
+
+    data object Spacer: CalendarRow("Spacer", type = "Spacer", index = -1)
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -45,7 +48,7 @@ fun CustomCalendarDisplay(
     daysHeader: @Composable (CalendarConfig) -> Unit = { cfg ->
         WeekDaysRow(
             startDayOfWeek = cfg.weekStartDay,
-            modifier = Modifier.background(AppColors.WhiteBG)
+            modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)
         )
     },
     dayCell: @Composable RowScope.(DayItem) -> Unit = { dayItem ->
@@ -62,7 +65,7 @@ fun CustomCalendarDisplay(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp),
-            color = AppColors.PrimaryDarkNavy,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             textAlign = TextAlign.Center,
             style = AppTypography.Body4,
         )
@@ -119,6 +122,8 @@ fun CustomCalendarDisplay(
                             }
                         }
                     }
+
+                    CalendarRow.Spacer -> Unit
                 }
             })
     }

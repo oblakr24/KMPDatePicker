@@ -21,6 +21,7 @@ import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -41,9 +42,9 @@ fun CustomCalendarBottomSheet(
     if (bottomSheetState.isOpen.value) {
         val insets = BottomSheetDefaults.windowInsets
         ModalBottomSheet(
-            contentColor = AppColors.WhiteBG,
+            contentColor = MaterialTheme.colorScheme.primaryContainer,
             scrimColor = AppColors.BlackAlpha20,
-            containerColor = AppColors.WhiteBG,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
             windowInsets = insets.union(WindowInsets(top = 0.dp, bottom = 48.dp)),
             onDismissRequest = {
                 bottomSheetState.close()
@@ -72,7 +73,7 @@ fun CustomCalendarBottomSheet(
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Close,
-                                tint = Color.Unspecified,
+                                tint =  MaterialTheme.colorScheme.onPrimaryContainer,
                                 contentDescription = "Close",
                                 modifier = Modifier.size(20.dp),
                             )
@@ -101,7 +102,6 @@ fun CustomCalendarBottomSheet(
                         modifier = Modifier
                             .fillMaxWidth()
                             .wrapContentHeight()
-                            .padding(bottom = 4.dp)
                     ) {
                         footer?.let {
                             Surface(

@@ -1,8 +1,8 @@
 package commonui
 
-import AppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -38,11 +38,10 @@ data class GenericDialogState(
     }
 }
 
-
 @Composable
 fun GenericDialog(
     dialogState: GenericDialogState,
-    contentColor: Color = AppColors.OffWhiteBG,
+    contentColor: Color = MaterialTheme.colorScheme.primaryContainer,
     content: @Composable () -> Unit,
 ) {
     if (dialogState.isOpen.value) {

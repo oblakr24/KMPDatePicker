@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -54,7 +55,7 @@ fun CustomCalendarDialog(
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            tint = Color.Unspecified,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             contentDescription = "Close",
                             modifier = Modifier.size(20.dp),
                         )

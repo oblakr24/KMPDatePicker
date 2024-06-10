@@ -143,6 +143,7 @@ class CalendarViewModel(
     }
 
     fun onClick(date: LocalDate) {
+        if (date <= config.minStart) return
         _selection.update {
             it.modifyOnClick(date)
         }

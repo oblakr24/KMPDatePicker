@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SheetValue
@@ -100,7 +101,7 @@ data class GenericBottomSheetState(
 @Composable
 fun GenericBottomSheet(
     bottomSheetState: GenericBottomSheetState,
-    contentColor: Color = AppColors.OffWhiteBG,
+    contentColor: Color = MaterialTheme.colorScheme.primaryContainer,
     header: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
     footer: @Composable BoxScope.() -> Unit,
@@ -122,7 +123,7 @@ fun GenericBottomSheet(
             },
             contentColor = contentColor,
             scrimColor = AppColors.BlackAlpha20,
-            containerColor = AppColors.OffWhiteBG,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
             windowInsets = insets.union(WindowInsets(top = 0.dp, bottom = 48.dp)),
             onDismissRequest = {
                 bottomSheetState.close()
