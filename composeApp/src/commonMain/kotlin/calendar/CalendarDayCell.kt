@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -112,10 +114,10 @@ fun CalendarDayCell(item: DayItem,
                     modifier: Modifier = Modifier,
                     onClick: () -> Unit) {
     val styling = item.styling.resolved()
-    val height = 50.dp
+    val height = 35.dp
     Box(
         modifier = modifier
-            .height(height)
+            .height(50.dp)
             .let {
                 if (item.textStyling == DayItem.TextStyling.DISABLED) {
                     it
@@ -130,8 +132,8 @@ fun CalendarDayCell(item: DayItem,
         if (styling.bgFillLeft && styling.bgFillRight) {
             Box(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .aspectRatio(1f)
+                    .fillMaxWidth()
+                    .height(height)
                     .background(
                         when (item.monthType) {
                             DayItem.MonthType.PREV -> Color.Gray
@@ -143,9 +145,8 @@ fun CalendarDayCell(item: DayItem,
         } else if (styling.bgFillLeft) {
             Box(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .aspectRatio(1f)
-                    .padding(end = 25.dp)
+                    .fillMaxWidth(0.5f)
+                    .height(height)
                     .align(Alignment.CenterStart)
                     .background(
                         when (item.monthType) {
@@ -158,9 +159,8 @@ fun CalendarDayCell(item: DayItem,
         } else if (styling.bgFillRight) {
             Box(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .aspectRatio(1f)
-                    .padding(start = 25.dp)
+                    .fillMaxWidth(0.5f)
+                    .height(height)
                     .align(Alignment.CenterEnd)
                     .background(
                         when (item.monthType) {
@@ -174,16 +174,13 @@ fun CalendarDayCell(item: DayItem,
         if (item.inRangeFromPrevMonth || item.inRangeFromNextMonth) {
             Box(
                 modifier = Modifier
-                    .fillMaxHeight()
-                    .aspectRatio(1f)
+                    .size(height)
                     .background(Color.Gray),
             )
         }
         Box(
             modifier = Modifier
-                .fillMaxHeight()
-                .aspectRatio(1f)
-
+                .size(height)
                 .let {
                     if (styling.hasInnerShape) {
                         it.background(colors.selectionMainColor, RoundedCornerShape(50))
