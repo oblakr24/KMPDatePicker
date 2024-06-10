@@ -1,10 +1,11 @@
 import calendar.YearMonth
-import kotlinx.datetime.*
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.format
 import kotlinx.datetime.format.FormatStringsInDatetimeFormats
 import kotlinx.datetime.format.byUnicodePattern
-import kotlinx.datetime.format.char
-import kotlinx.datetime.format.optional
-
+import kotlinx.datetime.toLocalDateTime
 
 fun Instant.formatted() = formatInstant(this)
 
@@ -15,6 +16,7 @@ private fun formatInstant(instant: Instant): String {
 }
 
 fun YearMonth.format(): String {
+
     val month = DateFormats.monthAbbreviations[month.ordinal]
     return "$month, $year"
 }
@@ -31,14 +33,5 @@ object DateFormats {
     @OptIn(FormatStringsInDatetimeFormats::class)
     val dateTime = LocalDateTime.Format {
         byUnicodePattern(FORMAT_PATTERN)
-    }
-
-    val custom = LocalDateTime.Format {
-        monthNumber();
-        char('/');
-        dayOfMonth()
-        char(' ')
-        hour(); char(':'); minute()
-        optional { char(':'); second() }
     }
 }
