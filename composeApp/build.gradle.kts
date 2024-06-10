@@ -204,8 +204,8 @@ fun File.readVersion(): List<Int> {
 // Prepare the wasm distribution and copy it over to the docs folder
 // Run via ./gradlew prepareWasmPage
 tasks.register<Copy>("prepareWasmPage") {
-    dependsOn("wasmJsBrowserDistribution")
     dependsOn(incrementVersion)
+    dependsOn("wasmJsBrowserDistribution")
     from("$rootDir/composeApp/build/dist/wasmJs/productionExecutable")
     into("$rootDir/docs")
     doFirst {
