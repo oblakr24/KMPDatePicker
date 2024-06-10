@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.datetime.DayOfWeek
@@ -45,14 +47,14 @@ data class CalendarConfig(
 )
 
 class CalendarViewModel(
-    scope: CoroutineScope,
+    private val scope: CoroutineScope,
     private val config: CalendarConfig,
 ) {
 
     private val months by lazy { createMonthsBetween(config.startMonth, config.endMonth) }
 
     private val monthData by lazy {
-        months.map { MonthData(it.format(), items = createDayItemsInAMonth(it)) }
+        months.mapIndexed { index, yearMonth -> MonthData(yearMonth.format(), index = index, month = yearMonth, items = createDayItemsInAMonth(yearMonth)) }
     }
 
     private val _selection = MutableStateFlow(config.initialSelection)
@@ -60,6 +62,8 @@ class CalendarViewModel(
 
     val selection = _selection.asStateFlow()
     val initialSelection = _initialSelection.asStateFlow()
+
+    private val monthFlows = mutableMapOf<Int, StateFlow<List<CalendarRow>>>()
 
     private val limit = MutableStateFlow(
         AllowedRange(
@@ -86,6 +90,32 @@ class CalendarViewModel(
             scope,
             SharingStarted.WhileSubscribed(5000),
             createCalendarRowItems(decoratedMonths.value)
+        )
+    }
+
+    fun createItemsForMonth(index: Int): StateFlow<List<CalendarRow>> {
+        val created = monthFlows[index]
+        if (created != null) {
+            return created
+        }
+        val new = decoratedMonths.mapNotNull { months ->
+            months.firstOrNull { it.index == index }
+        }.map {
+            createPagedCalendarRowItems(it)
+        }.stateIn(scope, SharingStarted.WhileSubscribed(5000),
+            decoratedMonths.value.firstOrNull { it.index == index }?.let {
+                createPagedCalendarRowItems(it)
+            } ?: emptyList()
+        )
+        monthFlows[index] = new
+        return new
+    }
+
+    val monthCount: StateFlow<Int> by lazy {
+        decoratedMonths.map { it.size }.stateIn(
+            scope,
+            SharingStarted.WhileSubscribed(5000),
+            decoratedMonths.value.size,
         )
     }
 
@@ -200,7 +230,7 @@ class CalendarViewModel(
         val allRows = mutableListOf<CalendarRow>()
         val columns = 7
         var index = 0
-        months.map { monthItem ->
+        months.forEach { monthItem ->
             val items = monthItem.items
             val numberOfRows = (items.size + columns - 1) / columns
 
@@ -233,6 +263,46 @@ class CalendarViewModel(
                 index++
                 row
             })
+        }
+        return allRows
+    }
+
+    private fun createPagedCalendarRowItems(monthItem: MonthData): List<CalendarRow> {
+        val allRows = mutableListOf<CalendarRow>()
+        val columns = 7
+
+        val items = monthItem.items
+        val numberOfRows = (items.size + columns - 1) / columns
+
+        allRows.add(
+            CalendarRow.MonthHeader(
+                monthItem.monthDisplay,
+                id = monthItem.monthDisplay,
+                index = 0,
+            )
+        )
+
+        val monthRows = (0..numberOfRows).map { rowIndex ->
+            val rowItems = mutableListOf<DayItem>()
+            for (columnIndex in 0 until 7) {
+                val itemIndex = rowIndex * 7 + columnIndex
+                if (itemIndex < items.size) {
+                    rowItems.add(items[itemIndex])
+                }
+            }
+            rowItems
+        }
+
+        allRows.addAll(monthRows.mapIndexed { idx, dayItems ->
+            val row = CalendarRow.Dates(
+                dayItems,
+                id = "Row_${monthItem.monthDisplay}_$idx",
+                index = idx+1,
+            )
+            row
+        })
+        if (allRows.size < 8) {
+            allRows.add(CalendarRow.Spacer)
         }
         return allRows
     }
@@ -288,7 +358,9 @@ class CalendarViewModel(
 
     private fun DayItem.resolveRangeStyling(selection: RangeSelection) = when (selection) {
         is Range -> when {
-            date.isEqual(selection.start) -> RangeStyling.IN_RANGE_START
+            date.isEqual(selection.start) -> {
+                if (selection.isSingle()) RangeStyling.SINGLE else RangeStyling.IN_RANGE_START
+            }
             date.isEqual(selection.end) && selection.endInclusive -> RangeStyling.IN_RANGE_END
             (date.isAfter(selection.start) && (date.isBefore(selection.end) || (date.isEqual(
                 selection.end
