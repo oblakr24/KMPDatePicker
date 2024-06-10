@@ -131,3 +131,17 @@ compose.desktop {
         }
     }
 }
+
+// Prepare the wasm distribution and copy it over to the docs folder
+tasks.register<Copy>("prepareWasmPage") {
+    dependsOn("wasmJsBrowserDistribution")
+    from("$rootDir/composeApp/build/dist/wasmJs/productionExecutable")
+    into("$rootDir/docs")
+    doFirst {
+        val targetDir = file("$rootDir/docs")
+        if (targetDir.exists()) {
+            delete(targetDir)
+        }
+        mkdir(targetDir)
+    }
+}
