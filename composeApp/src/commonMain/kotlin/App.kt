@@ -1,11 +1,16 @@
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,11 +21,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import calendar.CalendarConfig
 import calendar.CalendarViewModel
 import calendar.CustomCalendarBottomSheet
 import calendar.CustomCalendarDialog
+import calendar.CustomCalendarPagerDialog
+import com.rokoblak.kmpdatepicker.config.AppBuildConfig
 import commonui.PrimaryTextButton
 import commonui.rememberGenericDialogState
 import org.jetbrains.compose.ui.tooling.preview.Preview
@@ -29,18 +39,33 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @Composable
 @Preview
 fun App() {
-    AppTheme {
+    var darkTheme: Boolean by remember { mutableStateOf(false) }
+    var useSystemTheme: Boolean by remember { mutableStateOf(false) }
+    AppTheme(overrideDarkMode = if (useSystemTheme) null else darkTheme) {
+
         Column(
-            Modifier.fillMaxWidth().padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            Modifier.fillMaxWidth().fillMaxHeight().background(MaterialTheme.colorScheme.background).padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Text("This is a demo")
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                Text("Dark theme", modifier = Modifier.padding(8.dp), color = MaterialTheme.colorScheme.onBackground)
+                Switch(checked = darkTheme, onCheckedChange = { checked ->
+                    darkTheme = checked
+                })
+            }
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                Text("Use system theme", modifier = Modifier.padding(8.dp), color = MaterialTheme.colorScheme.onBackground)
+                Switch(checked = useSystemTheme, onCheckedChange = { checked ->
+                    useSystemTheme = checked
+                })
+            }
 
             var confirmed: Boolean by remember { mutableStateOf(false) }
-            var singleSelection: Boolean by remember { mutableStateOf(true) }
+            var singleSelection: Boolean by remember { mutableStateOf(false) }
 
             val calendarState = rememberGenericBottomSheetState()
             val calendarDialogState = rememberGenericDialogState()
+            val calendarPagerDialogState = rememberGenericDialogState()
 
             val scope = rememberCoroutineScope()
             val calendarVM = remember(singleSelection) {
@@ -53,8 +78,7 @@ fun App() {
 
             val selection = calendarVM.selection.collectAsState().value
 
-            CustomCalendarBottomSheet(calendarState, calendarVM, header = {
-            }, footer = {
+            CustomCalendarBottomSheet(calendarState, calendarVM, footer = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
@@ -66,14 +90,25 @@ fun App() {
                 }
             })
 
-            CustomCalendarDialog(calendarDialogState, calendarVM, header = {
-            }, footer = {
+            CustomCalendarDialog(calendarDialogState, calendarVM, footer = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     PrimaryTextButton("Confirm") {
                         calendarDialogState.close()
+                        confirmed = true
+                    }
+                }
+            })
+
+            CustomCalendarPagerDialog(calendarPagerDialogState, calendarVM, footer = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    PrimaryTextButton("Confirm") {
+                        calendarPagerDialogState.close()
                         confirmed = true
                     }
                 }
@@ -89,15 +124,28 @@ fun App() {
                 confirmed = false
             }
 
-            Switch(checked = singleSelection, onCheckedChange = { checked ->
-                singleSelection = checked
-            })
-
-            if (confirmed) {
-                Text("Selection is: $selection")
-            } else {
-                Text("Selection pending")
+            PrimaryTextButton("Open Date Pager Dialog") {
+                calendarPagerDialogState.open()
+                confirmed = false
             }
+
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                Text("Single selection", modifier = Modifier.padding(8.dp), color = MaterialTheme.colorScheme.onBackground)
+                Switch(checked = singleSelection, onCheckedChange = { checked ->
+                    singleSelection = checked
+                })
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Text("Current selection:", color = MaterialTheme.colorScheme.onBackground)
+            if (confirmed) {
+                Text("$selection", textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.onBackground)
+            } else {
+                Text("Selection pending", color = MaterialTheme.colorScheme.onBackground)
+            }
+
+            Spacer(modifier = Modifier.height(48.dp))
+            Text("Version: ${AppBuildConfig.VERSION}", color = MaterialTheme.colorScheme.onBackground)
         }
     }
 }
