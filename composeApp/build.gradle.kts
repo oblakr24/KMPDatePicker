@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
@@ -69,7 +70,6 @@ kotlin {
             
             // Coroutines
             implementation(libs.kotlinx.coroutines.core)
-//            runtimeOnly(libs.kotlinx.coroutines.swing)
             
             implementation(libs.kotlinx.datetime)
             
@@ -105,11 +105,34 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
+
+    signingConfigs {
+        create("release") {
+            val prop = Properties().apply {
+                load(FileInputStream(File(rootProject.rootDir, "local.properties")))
+            }
+            val storePass = prop.getProperty("STORE_PASS", null) ?: throw IllegalAccessError("No store pass, please ensure you have it in local.properties")
+            val keyPass = prop.getProperty("KEY_PASS", null) ?: throw IllegalAccessError("No key pass, please ensure you have it in local.properties")
+
+            storeFile = file("kmpdatepicker.jks")
+            storePassword = storePass
+            keyAlias = "kmpdatepicker"
+            keyPassword = keyPass
         }
     }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("release")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
