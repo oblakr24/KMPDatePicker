@@ -29,6 +29,7 @@ import calendar.CalendarConfig
 import calendar.CalendarViewModel
 import calendar.CustomCalendarBottomSheet
 import calendar.CustomCalendarDialog
+import calendar.CustomCalendarDialogBuiltIn
 import calendar.CustomCalendarPagerDialog
 import com.rokoblak.kmpdatepicker.config.AppBuildConfig
 import commonui.PrimaryTextButton
@@ -65,6 +66,7 @@ fun App() {
 
             val calendarState = rememberGenericBottomSheetState()
             val calendarDialogState = rememberGenericDialogState()
+            val calendarBuiltInDialogState = rememberGenericDialogState()
             val calendarPagerDialogState = rememberGenericDialogState()
 
             val scope = rememberCoroutineScope()
@@ -102,6 +104,18 @@ fun App() {
                 }
             })
 
+            CustomCalendarDialogBuiltIn(calendarBuiltInDialogState, footer = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    PrimaryTextButton("Confirm") {
+                        calendarBuiltInDialogState.close()
+                        confirmed = true
+                    }
+                }
+            })
+
             CustomCalendarPagerDialog(calendarPagerDialogState, calendarVM, footer = {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -121,6 +135,11 @@ fun App() {
 
             PrimaryTextButton("Open Date Dialog") {
                 calendarDialogState.open()
+                confirmed = false
+            }
+
+            PrimaryTextButton("Open Date Dialog (builtin)") {
+                calendarBuiltInDialogState.open()
                 confirmed = false
             }
 
