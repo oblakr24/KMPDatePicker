@@ -41,7 +41,6 @@ fun App(pathInput: PathInput = PathInput.None) {
     var darkTheme: Boolean by remember { mutableStateOf(false) }
     var useSystemTheme: Boolean by remember { mutableStateOf(false) }
     AppTheme(overrideDarkMode = if (useSystemTheme) null else darkTheme) {
-
         Column(
             Modifier.fillMaxWidth().fillMaxHeight().background(MaterialTheme.colorScheme.background).padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -65,7 +64,7 @@ fun App(pathInput: PathInput = PathInput.None) {
             var singleSelection: Boolean by remember { mutableStateOf(false) }
 
             val calendarState = rememberGenericBottomSheetState()
-            val calendarDialogState = rememberGenericDialogState(isOpenInitially = pathInput is PathInput.OpenPickerDialog)
+            val calendarDialogState = rememberGenericDialogState(isOpenInitially = false)
             val calendarBuiltInDialogState = rememberGenericDialogState()
             val calendarPagerDialogState = rememberGenericDialogState()
 
@@ -104,17 +103,18 @@ fun App(pathInput: PathInput = PathInput.None) {
                 }
             })
 
-            CustomCalendarDialogBuiltIn(calendarBuiltInDialogState, footer = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    PrimaryTextButton("Confirm") {
-                        calendarBuiltInDialogState.close()
-                        confirmed = true
-                    }
-                }
-            })
+            // Has an issue on WASM production
+//            CustomCalendarDialogBuiltIn(calendarBuiltInDialogState, footer = {
+//                Row(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    horizontalArrangement = Arrangement.Center
+//                ) {
+//                    PrimaryTextButton("Confirm") {
+//                        calendarBuiltInDialogState.close()
+//                        confirmed = true
+//                    }
+//                }
+//            })
 
             CustomCalendarPagerDialog(calendarPagerDialogState, calendarVM, footer = {
                 Row(
@@ -138,10 +138,10 @@ fun App(pathInput: PathInput = PathInput.None) {
                 confirmed = false
             }
 
-            PrimaryTextButton("Open Date Dialog (builtin)") {
-                calendarBuiltInDialogState.open()
-                confirmed = false
-            }
+//            PrimaryTextButton("Open Date Dialog (builtin)") {
+//                calendarBuiltInDialogState.open()
+//                confirmed = false
+//            }
 
             PrimaryTextButton("Open Date Pager Dialog") {
                 calendarPagerDialogState.open()
