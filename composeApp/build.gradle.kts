@@ -15,6 +15,7 @@ plugins {
 }
 
 kotlin {
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "composeApp"
@@ -164,8 +165,7 @@ val versionTextFile = "version.txt"
 val packageName = "com.rokoblak.kmpdatepicker"
 
 tasks.register("generateBuildConfig") {
-
-    val versionFile = File(versionTextFile)
+    val versionFile = File(rootDir.toPath().toString() + "/" + versionTextFile)
     if (!versionFile.exists()) {
         throw GradleException("Version file does not exist.")
     }

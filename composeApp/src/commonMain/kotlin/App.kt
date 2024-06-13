@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.runtime.Composable
@@ -20,9 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import calendar.CalendarConfig
@@ -39,7 +37,7 @@ import org.jetbrains.compose.ui.tooling.preview.Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview
-fun App() {
+fun App(pathInput: PathInput = PathInput.None) {
     var darkTheme: Boolean by remember { mutableStateOf(false) }
     var useSystemTheme: Boolean by remember { mutableStateOf(false) }
     AppTheme(overrideDarkMode = if (useSystemTheme) null else darkTheme) {
@@ -48,6 +46,8 @@ fun App() {
             Modifier.fillMaxWidth().fillMaxHeight().background(MaterialTheme.colorScheme.background).padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Text("Input: $pathInput", modifier = Modifier.padding(8.dp), color = MaterialTheme.colorScheme.onBackground)
+
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                 Text("Dark theme", modifier = Modifier.padding(8.dp), color = MaterialTheme.colorScheme.onBackground)
                 Switch(checked = darkTheme, onCheckedChange = { checked ->
@@ -65,7 +65,7 @@ fun App() {
             var singleSelection: Boolean by remember { mutableStateOf(false) }
 
             val calendarState = rememberGenericBottomSheetState()
-            val calendarDialogState = rememberGenericDialogState()
+            val calendarDialogState = rememberGenericDialogState(isOpenInitially = pathInput is PathInput.OpenPickerDialog)
             val calendarBuiltInDialogState = rememberGenericDialogState()
             val calendarPagerDialogState = rememberGenericDialogState()
 
