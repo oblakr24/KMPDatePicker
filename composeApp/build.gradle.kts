@@ -165,7 +165,7 @@ val versionTextFile = "version.txt"
 val packageName = "com.rokoblak.kmpdatepicker"
 
 tasks.register("generateBuildConfig") {
-    val versionFile = File(rootDir.toPath().toString() + "/" + versionTextFile)
+    val versionFile = rootDir.resolve(versionTextFile)
     if (!versionFile.exists()) {
         throw GradleException("Version file does not exist.")
     }
@@ -231,6 +231,7 @@ fun File.readVersion(): List<Int> {
 // Run via ./gradlew prepareWasmPage
 tasks.register<Copy>("prepareWasmPage") {
     dependsOn(incrementVersion)
+    dependsOn("generateBuildConfig")
     dependsOn("wasmJsBrowserDistribution")
     from("$rootDir/composeApp/build/dist/wasmJs/productionExecutable")
     into("$rootDir/docs")
