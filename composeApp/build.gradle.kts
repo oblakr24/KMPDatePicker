@@ -170,9 +170,9 @@ tasks.register("generateBuildConfig") {
         throw GradleException("Version file does not exist.")
     }
 
-    val (major, minor, patch) = versionFile.readVersion()
-    val formattedVersion = "$major.$minor.$patch"
     doLast {
+        val (major, minor, patch) = versionFile.readVersion()
+        val formattedVersion = "$major.$minor.$patch"
         val fileContent = """
             package $packageName.config
             
@@ -181,6 +181,8 @@ tasks.register("generateBuildConfig") {
                 const val VERSION = "$formattedVersion"
             }
         """.trimIndent()
+
+        println("Generating build config version: $formattedVersion")
 
         val buildDir = layout.buildDirectory.get().asFile
         val commonMainDir = file("${buildDir}/generated/kotlin/config/")
@@ -231,7 +233,6 @@ fun File.readVersion(): List<Int> {
 // Run via ./gradlew prepareWasmPage
 tasks.register<Copy>("prepareWasmPage") {
     dependsOn(incrementVersion)
-    dependsOn("generateBuildConfig")
     dependsOn("wasmJsBrowserDistribution")
     from("$rootDir/composeApp/build/dist/wasmJs/productionExecutable")
     into("$rootDir/docs")
