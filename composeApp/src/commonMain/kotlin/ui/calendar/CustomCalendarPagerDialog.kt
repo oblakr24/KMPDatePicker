@@ -1,11 +1,10 @@
-package calendar
+package ui.calendar
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,14 +13,13 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.DatePickerDefaults
-import androidx.compose.material3.DateRangePicker
+import androidx.compose.material.icons.filled.Expand
+import androidx.compose.material.icons.filled.HorizontalSplit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,10 +29,10 @@ import commonui.GenericDialog
 import commonui.GenericDialogState
 import commonui.PrimaryTextButton
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomCalendarDialogBuiltIn(
+fun CustomCalendarPagerDialog(
     dialogState: GenericDialogState,
+    vm: CalendarViewModel = rememberCalendarViewModel(),
     header: @Composable (() -> Unit)? = null,
     footer: @Composable (() -> Unit)? = null,
 ) {
@@ -44,11 +42,8 @@ fun CustomCalendarDialogBuiltIn(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.85f),
+                    .wrapContentHeight(),
             ) {
-                val datePickerState = rememberDateRangePickerState(
-                    yearRange = 2024..2026
-                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -79,21 +74,18 @@ fun CustomCalendarDialogBuiltIn(
                         header?.invoke()
                     }
                     PrimaryTextButton(text = "Clear") {
-                        datePickerState.setSelection(null, null)
+                        vm.clearSelection()
                     }
                 }
-                DateRangePicker(
-                    modifier = Modifier
+                CustomCalendarHorizontalDisplay(
+                    vm = vm, modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 0.dp, horizontal = 12.dp),
-                    state = datePickerState,
-                    showModeToggle = false,
+                        .wrapContentHeight()
                 )
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
-                        .padding(bottom = 4.dp)
                 ) {
                     footer?.let {
                         Surface(

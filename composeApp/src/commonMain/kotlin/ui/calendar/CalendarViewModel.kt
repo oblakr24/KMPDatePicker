@@ -1,10 +1,10 @@
-package calendar
+package ui.calendar
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import calendar.RangeSelection.*
-import calendar.DayItem.*
+import ui.calendar.RangeSelection.*
+import ui.calendar.DayItem.*
 import format
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -298,7 +298,7 @@ class CalendarViewModel(
             val row = CalendarRow.Dates(
                 dayItems,
                 id = "Row_${monthItem.monthDisplay}_$idx",
-                index = idx+1,
+                index = idx + 1,
             )
             row
         })

@@ -1,4 +1,4 @@
-package calendar
+package ui.calendar
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate

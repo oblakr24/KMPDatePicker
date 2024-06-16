@@ -1,4 +1,4 @@
-package calendar
+package ui.calendar
 
 import AppColors
 import GenericBottomSheetState

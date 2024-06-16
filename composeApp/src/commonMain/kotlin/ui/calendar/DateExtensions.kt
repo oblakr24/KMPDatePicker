@@ -1,6 +1,6 @@
-package calendar
+package ui.calendar
 
-import calendar.YearMonth
+import ui.calendar.YearMonth
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DatePeriod
 import kotlinx.datetime.DayOfWeek
