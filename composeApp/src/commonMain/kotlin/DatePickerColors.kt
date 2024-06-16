@@ -1,6 +1,6 @@
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import calendar.CalendarCellColors
+import ui.calendar.CalendarCellColors
 
 class DatePickerColors(
     val selectionRangeColor: Color,

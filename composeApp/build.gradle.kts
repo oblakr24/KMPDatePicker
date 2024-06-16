@@ -81,7 +81,7 @@ kotlin {
         }
 
         wasmJsMain.dependencies {
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-wasm-js:1.9.0-RC")
+            implementation(libs.kotlinx.coroutines.core.wasm.js)
         }
     }
 }
