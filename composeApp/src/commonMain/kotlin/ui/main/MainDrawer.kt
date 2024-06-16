@@ -41,11 +41,6 @@ fun LandingDrawer(
             .padding(top = 24.dp)
             .fillMaxWidth(), horizontalAlignment = Alignment.Start
     ) {
-        ButtonWithIcon(modifier = Modifier.padding(horizontal = 16.dp),
-            text = "FAQ",
-            icon = Icons.Outlined.QuestionAnswer,
-            onClick = { onAction(MainAction.FAQClicked) })
-        Spacer(modifier = Modifier.height(16.dp))
         Spacer(modifier = Modifier.weight(1f))
 
         Row(

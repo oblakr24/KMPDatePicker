@@ -4,6 +4,7 @@ import PathInput
 import com.rokoblak.kmpdatepicker.config.AppBuildConfig
 import data.AppStorage
 import data.DarkModeState
+import data.IntentHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 class MainComponent(
     private val pathInput: PathInput,
     private val storage: AppStorage,
+    private val intentHandler: IntentHandler,
 ) {
 
     private val scope = CoroutineScope(Dispatchers.Main + Job())
@@ -36,11 +38,8 @@ class MainComponent(
 
     fun onActon(action: MainAction) {
         when (action) {
-            MainAction.FAQClicked -> {
-
-            }
             MainAction.OpenRepoUrl -> {
-
+                intentHandler.openURL("https://github.com/oblakr24/KMPDatePicker")
             }
             is MainAction.SetDarkMode -> {
                 scope.launch {

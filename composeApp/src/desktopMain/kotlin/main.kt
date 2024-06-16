@@ -1,9 +1,10 @@
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import di.createAppComponent
+import di.ComponentCreator
 
 fun main() = application {
-    val appComponent = createAppComponent()
+    val componentCreator = ComponentCreator()
+    val appComponent = componentCreator.createAppComponent()
     Window(
         onCloseRequest = ::exitApplication,
         title = "KMPDatePicker",

@@ -1,8 +1,11 @@
 package di
 
 import data.AppStorage
+import data.PlatformProviders
 
-class AppComponent {
+class AppComponent(
+    private val platformProviders: PlatformProviders
+) {
 
     private var storage: AppStorage? = null
 
@@ -11,7 +14,12 @@ class AppComponent {
             storage = it
         }
     }
+
+    fun intentHandler() = platformProviders.intentHandler()
 }
 
+expect class ComponentCreator {
 
-fun createAppComponent(): AppComponent = AppComponent()
+    fun createAppComponent(): AppComponent
+
+}

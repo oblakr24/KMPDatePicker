@@ -12,7 +12,11 @@ import ui.main.MainScreen
 @Preview
 fun App(pathInput: PathInput = PathInput.None, component: AppComponent) {
     val mainComponent = remember(pathInput) {
-        MainComponent(pathInput = pathInput, storage = component.storage())
+        MainComponent(
+            pathInput = pathInput,
+            storage = component.storage(),
+            intentHandler = component.intentHandler()
+        )
     }
 
     val darkTheme = mainComponent.darkMode.collectAsState().value

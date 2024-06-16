@@ -12,7 +12,7 @@ import UIKit
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     
-       let diComponent: AppComponent = AppComponentKt.createAppComponent()
+    let diComponent: AppComponent = ComponentCreator().createAppComponent()
 
        override init() {
            super.init()
