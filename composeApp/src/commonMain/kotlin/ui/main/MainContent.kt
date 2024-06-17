@@ -1,6 +1,7 @@
 package ui.main
 
 import PathInput
+import alpha
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.rokoblak.kmpdatepicker.config.AppBuildConfig
 import commonui.PrimaryTextButton
 import commonui.rememberGenericDialogState
 import kotlinx.coroutines.launch
@@ -73,44 +74,50 @@ fun MainContent(state: MainContentUIState, onAction: (MainAction) -> Unit) {
     ) {
         Scaffold(
             topBar = {
-                CenterAlignedTopAppBar(title = {
-                    Text(
-                        "KMP Date Picker Demo",
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }, navigationIcon = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            drawerState.open()
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.Menu,
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                            contentDescription = "Open",
-                            modifier = Modifier.size(20.dp),
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            "KMP Date Picker Demo",
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                    }
-                })
-            }, content = {
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            scope.launch {
+                                drawerState.open()
+                            }
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Menu,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                contentDescription = "Open",
+                                modifier = Modifier.size(20.dp),
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.alpha(0.5f)
+                    )
+                )
+            }, content = { padding ->
                 Column(
-                    Modifier.fillMaxWidth().fillMaxHeight()
-                        .background(MaterialTheme.colorScheme.background).padding(24.dp),
+                    Modifier.fillMaxWidth().fillMaxHeight().padding(padding)
+                        .background(MaterialTheme.colorScheme.background),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     var confirmed: Boolean by remember { mutableStateOf(false) }
                     var singleSelection: Boolean by remember { mutableStateOf(false) }
 
-                    val calendarState = rememberGenericBottomSheetState()
-                    val calendarDialogState =
+                    val bottomSheetState = rememberGenericBottomSheetState()
+                    val dialogState =
                         rememberGenericDialogState(isOpenInitially = state.pathInput == PathInput.OpenPickerDialog)
-                    val calendarBuiltInDialogState = rememberGenericDialogState()
-                    val calendarPagerDialogState = rememberGenericDialogState()
+                    val builtInDialogState = rememberGenericDialogState()
+                    val pagerDialogState = rememberGenericDialogState()
 
-                    val scope = rememberCoroutineScope()
+                    val calendarVMScope = rememberCoroutineScope()
                     val calendarVM = remember(singleSelection) {
                         CalendarViewModel(
-                            scope, CalendarConfig(
+                            calendarVMScope, CalendarConfig(
                                 singleSelection = singleSelection
                             )
                         )
@@ -118,71 +125,75 @@ fun MainContent(state: MainContentUIState, onAction: (MainAction) -> Unit) {
 
                     val selection = calendarVM.selection.collectAsState().value
 
-                    CustomCalendarBottomSheet(calendarState, calendarVM, footer = {
+                    CustomCalendarBottomSheet(bottomSheetState, calendarVM, footer = {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface),
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            PrimaryTextButton("Confirm") {
-                                calendarState.close()
+                            PrimaryTextButton("Confirm1") {
+                                bottomSheetState.close()
                                 confirmed = true
                             }
                         }
                     })
 
-                    CustomCalendarDialog(calendarDialogState, calendarVM, footer = {
+                    CustomCalendarDialog(dialogState, calendarVM, footer = {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             PrimaryTextButton("Confirm") {
-                                calendarDialogState.close()
+                                dialogState.close()
                                 confirmed = true
                             }
                         }
                     })
 
-                    CustomCalendarDialogBuiltIn(calendarBuiltInDialogState, footer = {
+                    CustomCalendarDialogBuiltIn(builtInDialogState, footer = {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             PrimaryTextButton("Confirm") {
-                                calendarBuiltInDialogState.close()
+                                builtInDialogState.close()
                                 confirmed = true
                             }
                         }
                     })
 
-                    CustomCalendarPagerDialog(calendarPagerDialogState, calendarVM, footer = {
+                    CustomCalendarPagerDialog(pagerDialogState, calendarVM, footer = {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.surface),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             PrimaryTextButton("Confirm") {
-                                calendarPagerDialogState.close()
+                                pagerDialogState.close()
                                 confirmed = true
                             }
                         }
                     })
 
                     PrimaryTextButton("Open Date Picker") {
-                        calendarState.open()
+                        bottomSheetState.open()
                         confirmed = false
                     }
 
                     PrimaryTextButton("Open Date Dialog") {
-                        calendarDialogState.open()
+                        dialogState.open()
                         confirmed = false
                     }
 
                     PrimaryTextButton("Open Date Dialog (builtin)") {
-                        calendarBuiltInDialogState.open()
+                        builtInDialogState.open()
                         confirmed = false
                     }
 
                     PrimaryTextButton("Open Date Pager Dialog") {
-                        calendarPagerDialogState.open()
+                        pagerDialogState.open()
                         confirmed = false
                     }
 
@@ -213,12 +224,7 @@ fun MainContent(state: MainContentUIState, onAction: (MainAction) -> Unit) {
                     } else {
                         Text("Selection pending", color = MaterialTheme.colorScheme.onBackground)
                     }
-
-                    Spacer(modifier = Modifier.height(48.dp))
-                    Text(
-                        "Version: ${AppBuildConfig.VERSION}",
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
 
             }, bottomBar = {
